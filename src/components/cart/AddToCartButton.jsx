@@ -55,17 +55,17 @@ const AddToCartButton = ({
 
   // Size variants
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base',
-    xl: 'px-8 py-4 text-lg'
+    sm: 'px-2 py-1 text-xs',
+    md: 'px-3 py-1.5 text-sm',
+    lg: 'px-4 py-2 text-sm',
+    xl: 'px-6 py-3 text-base'
   };
 
   const iconSizes = {
-    sm: 'h-4 w-4',
-    md: 'h-5 w-5',
-    lg: 'h-6 w-6',
-    xl: 'h-7 w-7'
+    sm: 'h-3 w-3',
+    md: 'h-4 w-4',
+    lg: 'h-5 w-5',
+    xl: 'h-6 w-6'
   };
 
   // Check if product is out of stock
@@ -141,7 +141,7 @@ const AddToCartButton = ({
     >
       {isAdding ? (
         <>
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          <div className={`animate-spin rounded-full border-b-2 border-white ${iconSizes[size]}`}></div>
           <span>Adding...</span>
         </>
       ) : (

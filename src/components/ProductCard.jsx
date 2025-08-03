@@ -96,7 +96,7 @@ const ProductCard = ({ product }) => {
           <AddToCartButton
             product={product}
             size="sm"
-            className="text-sm px-6 py-2.5 shadow-lg hover:shadow-glow transform hover:-translate-y-1 transition-all duration-300 group-hover:animate-glow"
+            className="shadow-lg hover:shadow-glow transform hover:-translate-y-1 transition-all duration-300 group-hover:animate-glow"
           />
         </div>
       </div>
