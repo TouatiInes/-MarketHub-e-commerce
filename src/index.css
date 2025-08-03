@@ -357,7 +357,7 @@
 /* Mobile-Specific Improvements */
 @media (max-width: 768px) {
   .hero-bg {
-    min-height: 100vh;
+    min-height: 80vh;
     padding: 1rem 0;
   }
 
@@ -390,7 +390,7 @@
   }
 
   .hero-bg {
-    min-height: 80vh;
+    min-height: 70vh;
   }
 }
 
