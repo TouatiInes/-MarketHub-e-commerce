@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "markethub-ecommerce",
+  "name": "markethub-store-2025",
   "builds": [
     {
       "src": "package.json",
