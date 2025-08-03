@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { ShoppingCartIcon, Bars3Icon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon, UserIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import { useAuth } from '../contexts/AuthContext'
+import CartIcon from './cart/CartIcon'
 
-const Header = ({ cartItems, currentPage, onNavigate, onSearch, searchQuery }) => {
+const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
+  const { user, isAuthenticated, logout } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
 
   const handleSearchSubmit = (e) => {
     e.preventDefault()
@@ -24,8 +26,9 @@ const Header = ({ cartItems, currentPage, onNavigate, onSearch, searchQuery }) =
   const navItems = [
     { id: 'home', label: 'Home' },
     { id: 'products', label: 'Products' },
-    { id: 'about', label: 'About' },
-    { id: 'contact', label: 'Contact' }
+    { id: 'features', label: 'Features' },
+    { id: 'wishlist', label: 'Wishlist' },
+    { id: 'compare', label: 'Compare' }
   ]
 
   return (
@@ -88,14 +91,94 @@ const Header = ({ cartItems, currentPage, onNavigate, onSearch, searchQuery }) =
             </button>
 
             {/* Cart */}
-            <button className="relative touch-target text-gray-300 hover:text-white transition-all duration-300 transform hover:scale-110 hover:shadow-glow rounded-lg" aria-label={`Shopping cart with ${totalItems} items`}>
-              <ShoppingCartIcon className="h-6 w-6" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-accent-500 to-accent-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-bounce-gentle shadow-lg">
-                  {totalItems}
-                </span>
-              )}
-            </button>
+            <CartIcon className="text-gray-300 hover:text-white transition-all duration-300 transform hover:scale-110 hover:shadow-glow rounded-lg" />
+
+            {/* User Authentication */}
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors touch-target"
+                  aria-label="User menu"
+                >
+                  <div className="h-8 w-8 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full flex items-center justify-center">
+                    <UserIcon className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="hidden md:block text-sm font-medium">
+                    {user?.firstName || 'User'}
+                  </span>
+                  <ChevronDownIcon className="hidden md:block h-4 w-4" />
+                </button>
+
+                {/* User Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">
+                        {user?.firstName} {user?.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        onNavigate('profile')
+                        setIsUserMenuOpen(false)
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      My Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('orders')
+                        setIsUserMenuOpen(false)
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      My Orders
+                    </button>
+                    {user?.role === 'admin' && (
+                      <button
+                        onClick={() => {
+                          onNavigate('admin')
+                          setIsUserMenuOpen(false)
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-purple-700 hover:bg-purple-50 transition-colors"
+                      >
+                        Admin Panel
+                      </button>
+                    )}
+                    <div className="border-t border-gray-100 mt-2 pt-2">
+                      <button
+                        onClick={() => {
+                          logout()
+                          setIsUserMenuOpen(false)
+                          onNavigate('home')
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="hidden md:flex items-center space-x-3">
+                <button
+                  onClick={() => onNavigate('login')}
+                  className="text-gray-300 hover:text-white transition-colors font-medium"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => onNavigate('register')}
+                  className="btn-primary px-4 py-2"
+                >
+                  Sign Up
+                </button>
+              </div>
+            )}
 
             {/* Mobile menu button */}
             <button
@@ -149,6 +232,87 @@ const Header = ({ cartItems, currentPage, onNavigate, onSearch, searchQuery }) =
                   {item.label}
                 </button>
               ))}
+
+              {/* Mobile Authentication */}
+              <div className="border-t border-primary-700 mt-4 pt-4">
+                {isAuthenticated ? (
+                  <>
+                    <div className="px-3 py-2 mb-2">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-10 w-10 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full flex items-center justify-center">
+                          <UserIcon className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-white font-medium">
+                            {user?.firstName} {user?.lastName}
+                          </p>
+                          <p className="text-gray-400 text-sm">{user?.email}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        onNavigate('profile')
+                        setIsMenuOpen(false)
+                      }}
+                      className="block w-full text-left px-3 py-3 text-gray-300 hover:text-white transition-colors min-h-[44px] flex items-center"
+                    >
+                      My Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('orders')
+                        setIsMenuOpen(false)
+                      }}
+                      className="block w-full text-left px-3 py-3 text-gray-300 hover:text-white transition-colors min-h-[44px] flex items-center"
+                    >
+                      My Orders
+                    </button>
+                    {user?.role === 'admin' && (
+                      <button
+                        onClick={() => {
+                          onNavigate('admin')
+                          setIsMenuOpen(false)
+                        }}
+                        className="block w-full text-left px-3 py-3 text-purple-300 hover:text-purple-100 transition-colors min-h-[44px] flex items-center"
+                      >
+                        Admin Panel
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        logout()
+                        setIsMenuOpen(false)
+                        onNavigate('home')
+                      }}
+                      className="block w-full text-left px-3 py-3 text-red-300 hover:text-red-100 transition-colors min-h-[44px] flex items-center"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        onNavigate('login')
+                        setIsMenuOpen(false)
+                      }}
+                      className="block w-full text-left px-3 py-3 text-gray-300 hover:text-white transition-colors min-h-[44px] flex items-center"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('register')
+                        setIsMenuOpen(false)
+                      }}
+                      className="block w-full text-left px-3 py-3 bg-gradient-to-r from-accent-500 to-accent-600 text-white rounded-lg mx-3 mt-2 min-h-[44px] flex items-center justify-center"
+                    >
+                      Sign Up
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}

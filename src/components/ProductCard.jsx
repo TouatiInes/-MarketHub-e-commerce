@@ -1,8 +1,11 @@
 import { StarIcon } from '@heroicons/react/24/solid'
 import { StarIcon as StarOutlineIcon } from '@heroicons/react/24/outline'
 import ResponsiveImage from './ResponsiveImage'
+import AddToCartButton from './cart/AddToCartButton'
+import WishlistButton from './wishlist/WishlistButton'
 
-const ProductCard = ({ product, onAddToCart }) => {
+
+const ProductCard = ({ product }) => {
   const renderStars = (rating) => {
     const stars = []
     const fullStars = Math.floor(rating)
@@ -51,11 +54,10 @@ const ProductCard = ({ product, onAddToCart }) => {
           </div>
         </div>
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
-          <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
-            <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </div>
+          <WishlistButton
+            product={product}
+            className="bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white"
+          />
         </div>
       </div>
       
@@ -91,17 +93,11 @@ const ProductCard = ({ product, onAddToCart }) => {
             <span className="text-xs text-gray-500">Free shipping</span>
           </div>
 
-          <button
-            onClick={() => onAddToCart(product)}
-            className="btn-primary text-sm px-6 py-2.5 shadow-lg hover:shadow-glow transform hover:-translate-y-1 transition-all duration-300 group-hover:animate-glow"
-          >
-            <span className="flex items-center space-x-2">
-              <span>Add to Cart</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </span>
-          </button>
+          <AddToCartButton
+            product={product}
+            size="sm"
+            className="text-sm px-6 py-2.5 shadow-lg hover:shadow-glow transform hover:-translate-y-1 transition-all duration-300 group-hover:animate-glow"
+          />
         </div>
       </div>
     </div>
