@@ -33,7 +33,7 @@ const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
   ]
 
   return (
-    <header className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 shadow-2xl sticky top-0 z-50 backdrop-blur-sm border-b border-primary-700/50">
+    <header className="bg-transparent shadow-lg sticky top-0 z-50 backdrop-blur-sm border-b border-gray-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
