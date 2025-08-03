@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketHub Responsive Testing Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #2e0176, #7916ff);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #f97316, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .testing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .device-frame {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .device-info {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .device-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #f97316;
+        }
+        
+        .device-specs {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .iframe-container {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .device-iframe {
+            width: 100%;
+            border: none;
+            background: white;
+        }
+        
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+        }
+        
+        .control-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #f97316, #ea580c);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #7916ff, #6b04fd);
+        }
+        
+        .preset-devices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .testing-checklist {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .checklist-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .checklist-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        @media (max-width: 768px) {
+            .testing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .preset-devices {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 MarketHub Responsive Testing</h1>
+            <p>Test your e-commerce website across multiple devices and screen sizes</p>
+        </div>
+        
+        <div class="controls">
+            <h3>🎛️ Testing Controls</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div class="control-group">
+                    <label for="url-input">Website URL:</label>
+                    <input type="url" id="url-input" placeholder="http://localhost:5173" value="http://localhost:5173">
+                </div>
+                <div class="control-group">
+                    <label for="custom-width">Custom Width:</label>
+                    <input type="number" id="custom-width" placeholder="375" min="200" max="2560">
+                </div>
+                <div class="control-group">
+                    <label for="custom-height">Custom Height:</label>
+                    <input type="number" id="custom-height" placeholder="667" min="200" max="1600">
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <button class="btn" onclick="loadAllFrames()">🔄 Reload All</button>
+                <button class="btn btn-secondary" onclick="addCustomDevice()">➕ Add Custom Device</button>
+                <button class="btn" onclick="toggleOrientation()">🔄 Toggle Orientation</button>
+            </div>
+            
+            <div class="preset-devices">
+                <button class="preset-btn" onclick="addDevice('iPhone SE', 375, 667)">iPhone SE</button>
+                <button class="preset-btn" onclick="addDevice('iPhone 12', 390, 844)">iPhone 12</button>
+                <button class="preset-btn" onclick="addDevice('iPhone 14 Pro Max', 430, 932)">iPhone 14 Pro Max</button>
+                <button class="preset-btn" onclick="addDevice('iPad', 768, 1024)">iPad</button>
+                <button class="preset-btn" onclick="addDevice('iPad Pro', 1024, 1366)">iPad Pro</button>
+                <button class="preset-btn" onclick="addDevice('Desktop', 1920, 1080)">Desktop</button>
+            </div>
+        </div>
+        
+        <div class="testing-grid" id="device-grid">
+            <!-- Devices will be added here -->
+        </div>
+        
+        <div class="testing-checklist">
+            <h3>✅ Responsive Testing Checklist</h3>
+            <div class="checklist-item">
+                <input type="checkbox" id="check1">
+                <label for="check1">Header navigation adapts properly on mobile</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check2">
+                <label for="check2">Product grid layout responds to screen size</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check3">
+                <label for="check3">Text remains readable at all sizes</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check4">
+                <label for="check4">Buttons are touch-friendly (44px minimum)</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check5">
+                <label for="check5">Images scale proportionally</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check6">
+                <label for="check6">No horizontal scrolling on any device</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check7">
+                <label for="check7">Forms are usable on mobile devices</label>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="check8">
+                <label for="check8">Animations perform smoothly</label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let deviceCounter = 0;
+        
+        function addDevice(name, width, height) {
+            const grid = document.getElementById('device-grid');
+            const deviceId = `device-${deviceCounter++}`;
+            const url = document.getElementById('url-input').value || 'http://localhost:5173';
+            
+            const deviceFrame = document.createElement('div');
+            deviceFrame.className = 'device-frame';
+            deviceFrame.innerHTML = `
+                <div class="device-info">
+                    <div class="device-name">${name}</div>
+                    <div class="device-specs">${width} × ${height}px</div>
+                    <button onclick="removeDevice('${deviceId}')" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-top: 5px;">Remove</button>
+                </div>
+                <div class="iframe-container">
+                    <iframe class="device-iframe" src="${url}" style="width: ${width}px; height: ${height}px; transform: scale(${Math.min(280/width, 200/height)}); transform-origin: top left;"></iframe>
+                </div>
+            `;
+            deviceFrame.id = deviceId;
+            grid.appendChild(deviceFrame);
+        }
+        
+        function removeDevice(deviceId) {
+            const device = document.getElementById(deviceId);
+            if (device) {
+                device.remove();
+            }
+        }
+        
+        function addCustomDevice() {
+            const width = parseInt(document.getElementById('custom-width').value) || 375;
+            const height = parseInt(document.getElementById('custom-height').value) || 667;
+            const name = `Custom ${width}×${height}`;
+            addDevice(name, width, height);
+        }
+        
+        function loadAllFrames() {
+            const iframes = document.querySelectorAll('.device-iframe');
+            const url = document.getElementById('url-input').value || 'http://localhost:5173';
+            iframes.forEach(iframe => {
+                iframe.src = url;
+            });
+        }
+        
+        function toggleOrientation() {
+            const devices = document.querySelectorAll('.device-frame');
+            devices.forEach(device => {
+                const iframe = device.querySelector('.device-iframe');
+                const specs = device.querySelector('.device-specs');
+                const currentStyle = iframe.style;
+                const currentWidth = parseInt(currentStyle.width);
+                const currentHeight = parseInt(currentStyle.height);
+                
+                iframe.style.width = currentHeight + 'px';
+                iframe.style.height = currentWidth + 'px';
+                specs.textContent = `${currentHeight} × ${currentWidth}px`;
+                
+                const scale = Math.min(280/currentHeight, 200/currentWidth);
+                iframe.style.transform = `scale(${scale})`;
+            });
+        }
+        
+        // Load automated testing script
+        function loadAutomatedTests() {
+            const script = document.createElement('script');
+            script.src = './automated-responsive-test.js';
+            script.type = 'module';
+            document.head.appendChild(script);
+
+            script.onload = function() {
+                console.log('Automated testing script loaded');
+                const button = document.createElement('button');
+                button.className = 'btn';
+                button.textContent = '🤖 Run Automated Tests';
+                button.onclick = function() {
+                    if (window.runResponsiveTests) {
+                        window.runResponsiveTests();
+                    } else {
+                        console.error('Automated testing not available');
+                    }
+                };
+
+                const controls = document.querySelector('.controls');
+                controls.appendChild(button);
+            };
+        }
+
+        // Initialize with common devices
+        window.onload = function() {
+            addDevice('iPhone SE', 375, 667);
+            addDevice('iPad', 768, 1024);
+            addDevice('Desktop', 1200, 800);
+
+            // Load automated testing
+            loadAutomatedTests();
+        };
+    </script>
+</body>
+</html>
