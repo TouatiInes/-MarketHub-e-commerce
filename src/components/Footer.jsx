@@ -105,6 +105,21 @@ const Footer = ({ onNavigate }) => {
           <p className="text-gray-300">
             © 2025 MarketHub. All rights reserved. Built with ❤️ for amazing shopping experiences.
           </p>
+
+          {/* Deployment Info */}
+          <div className="mt-4 pt-4 border-t border-primary-800">
+            <div className="text-center text-xs text-gray-400">
+              <p>🚀 MarketHub E-commerce Platform - Deployed on Vercel</p>
+              <p className="mt-1">
+                Built with React, Node.js & MongoDB • Features: JWT Auth • Shopping Cart • Wishlist • Product Management
+              </p>
+              <div className="mt-2">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-900 text-green-300 border border-green-700">
+                  ✅ Live on Vercel
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

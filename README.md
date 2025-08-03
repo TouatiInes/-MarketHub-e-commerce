@@ -1,5 +1,7 @@
 # 🛒 MarketHub - Premium E-commerce Platform
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/TouatiInes/-MarketHub-e-commerce)
+
 A modern, responsive e-commerce website built with React, Vite, and Tailwind CSS. Features a sophisticated dark purple and orange design with comprehensive accessibility and performance optimization.
 
 ![MarketHub Preview](https://via.placeholder.com/800x400/2e0176/ffffff?text=MarketHub+E-commerce+Platform)
@@ -68,6 +70,41 @@ A modern, responsive e-commerce website built with React, Vite, and Tailwind CSS
    ```
    http://localhost:5173
    ```
+
+## 🌐 Deploy to Vercel
+
+### One-Click Deploy
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/TouatiInes/-MarketHub-e-commerce)
+
+### Manual Deployment
+1. **Connect to Vercel**
+   - Sign up at [vercel.com](https://vercel.com)
+   - Connect your GitHub account
+   - Import this repository
+
+2. **Configure Build Settings**
+   - Framework Preset: **Vite**
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Install Command: `npm install`
+
+3. **Environment Variables** (Optional)
+   ```env
+   VITE_API_URL=https://your-backend-api.vercel.app/api
+   VITE_APP_NAME=MarketHub
+   NODE_ENV=production
+   ```
+
+4. **Deploy**
+   - Click "Deploy" and wait for build completion
+   - Your app will be live at `https://your-project-name.vercel.app`
+
+### Automatic Deployments
+- Every push to `main` branch triggers automatic deployment
+- Preview deployments for pull requests
+- Rollback to previous versions with one click
+
+For detailed deployment instructions, see [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md)
 
 ## 📁 Project Structure
 

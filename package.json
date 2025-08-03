@@ -11,7 +11,9 @@
     "server": "node server/server.js",
     "server:dev": "nodemon server/server.js",
     "seed": "node server/seeders/seedDatabase.js",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "deploy": "npm run build && vercel --prod",
+    "deploy:preview": "npm run build && vercel"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
