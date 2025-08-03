@@ -35,7 +35,7 @@ const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
   return (
     <header className="bg-transparent shadow-lg sticky top-0 z-50 backdrop-blur-sm border-b border-gray-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
             <button
@@ -47,7 +47,7 @@ const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-8 ml-12">
             {navItems.map(item => (
               <button
                 key={item.id}
@@ -81,7 +81,7 @@ const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
           </div>
 
           {/* Cart, Search and Mobile Menu */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 ml-auto">
             {/* Mobile Search Button */}
             <button
               className="md:hidden touch-target text-gray-300 hover:text-white transition-colors"
