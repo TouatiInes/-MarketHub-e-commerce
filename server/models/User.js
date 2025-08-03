@@ -60,8 +60,15 @@ const userSchema = new mongoose.Schema({
     isDefault: { type: Boolean, default: false }
   }],
   wishlist: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product'
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true
+    },
+    addedAt: {
+      type: Date,
+      default: Date.now
+    }
   }],
   cart: [{
     product: {

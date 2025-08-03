@@ -8,12 +8,17 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "node server/server.js",
-    "server:dev": "nodemon server/server.js",
-    "seed": "node server/seeders/seedDatabase.js",
-    "start": "node server/server.js",
+    "server": "cd server && npm start",
+    "server:dev": "cd server && npm run dev",
+    "server:install": "cd server && npm install",
+    "seed": "cd server && npm run seed",
+    "start": "cd server && npm start",
     "deploy": "npm run build && vercel --prod",
-    "deploy:preview": "npm run build && vercel"
+    "deploy:preview": "npm run build && vercel",
+    "deploy:server": "cd server && npm run deploy",
+    "install:all": "npm install && npm run server:install",
+    "dev:full": "concurrently \"npm run dev\" \"npm run server:dev\"",
+    "test:server": "cd server && npm test"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",
