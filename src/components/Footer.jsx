@@ -33,12 +33,12 @@ const Footer = ({ onNavigate }) => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4 text-accent-400">Quick Links</h4>
             <ul className="space-y-2">
               <li>
                 <button
                   onClick={() => onNavigate('home')}
-                  className="text-gray-300 hover:text-white transition-colors touch-target text-left w-full"
+                  className="text-gray-300 hover:text-white transition-colors text-left w-full"
                 >
                   Home
                 </button>
@@ -46,56 +46,90 @@ const Footer = ({ onNavigate }) => {
               <li>
                 <button
                   onClick={() => onNavigate('products')}
-                  className="text-gray-300 hover:text-white transition-colors touch-target text-left w-full"
+                  className="text-gray-300 hover:text-white transition-colors text-left w-full"
                 >
                   Products
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('about')}
-                  className="text-gray-300 hover:text-white transition-colors touch-target text-left w-full"
+                  onClick={() => onNavigate('cart')}
+                  className="text-gray-300 hover:text-white transition-colors text-left w-full"
                 >
-                  About Us
+                  Shopping Cart
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('contact')}
-                  className="text-gray-300 hover:text-white transition-colors touch-target text-left w-full"
+                  onClick={() => onNavigate('wishlist')}
+                  className="text-gray-300 hover:text-white transition-colors text-left w-full"
                 >
-                  Contact
+                  Wishlist
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate('compare')}
+                  className="text-gray-300 hover:text-white transition-colors text-left w-full"
+                >
+                  Compare Products
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Customer Service */}
+          {/* Categories */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Customer Service</h4>
+            <h4 className="text-lg font-semibold mb-4 text-accent-400">Categories</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors touch-target block">Help Center</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors touch-target block">Shipping Info</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors touch-target block">Returns</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors touch-target block">Size Guide</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors touch-target block">Track Order</a></li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Electronics
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Fashion
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Home & Garden
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Sports
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  Books
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Stay Updated</h4>
-            <p className="text-gray-300 mb-4">
-              Subscribe to our newsletter for the latest deals and updates.
-            </p>
-            <div className="flex">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-3 py-2 bg-primary-800 text-white placeholder-gray-400 border border-primary-700 rounded-l-lg focus:outline-none focus:border-accent-500"
-              />
-              <button className="bg-accent-500 hover:bg-accent-600 px-6 py-3 rounded-r-lg transition-colors min-h-[44px] flex items-center justify-center">
-                Subscribe
+            <h4 className="text-lg font-semibold mb-4 text-accent-400">Contact Us</h4>
+            <div className="space-y-2 text-gray-300 text-sm">
+              <p>Email: support@markethub.com</p>
+              <p>Phone: +1 (555) 123-4567</p>
+              <p>Hours: Mon-Fri 9AM-6PM EST</p>
+            </div>
+            <div className="mt-4 space-y-2">
+              <button
+                onClick={() => onNavigate('contact')}
+                className="block text-accent-400 hover:text-accent-300 text-sm font-medium transition-colors"
+              >
+                Contact Page →
+              </button>
+              <button
+                onClick={() => onNavigate('features')}
+                className="block text-accent-400 hover:text-accent-300 text-sm font-medium transition-colors"
+              >
+                View All Features →
               </button>
             </div>
           </div>
@@ -105,21 +139,6 @@ const Footer = ({ onNavigate }) => {
           <p className="text-gray-300">
             © 2025 MarketHub. All rights reserved. Built with ❤️ for amazing shopping experiences.
           </p>
-
-          {/* Deployment Info */}
-          <div className="mt-4 pt-4 border-t border-primary-800">
-            <div className="text-center text-xs text-gray-400">
-              <p>🚀 MarketHub E-commerce Platform - Deployed on Vercel</p>
-              <p className="mt-1">
-                Built with React, Node.js & MongoDB • Features: JWT Auth • Shopping Cart • Wishlist • Product Management
-              </p>
-              <div className="mt-2">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-900 text-green-300 border border-green-700">
-                  ✅ Live on Vercel
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </footer>

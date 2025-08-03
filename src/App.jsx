@@ -19,6 +19,7 @@ import PerformanceMonitor from './components/PerformanceMonitor'
 import AccessibilityChecker from './components/AccessibilityChecker'
 import BrowserCompatibilityChecker from './components/BrowserCompatibilityChecker'
 import DevToolsToggle from './components/DevToolsToggle'
+
 import CartSidebar from './components/cart/CartSidebar'
 import CartSidebarSimple from './components/cart/CartSidebarSimple'
 import CartPage from './components/cart/CartPage'

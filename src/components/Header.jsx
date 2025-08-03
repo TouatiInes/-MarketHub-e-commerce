@@ -28,7 +28,8 @@ const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
     { id: 'products', label: 'Products' },
     { id: 'features', label: 'Features' },
     { id: 'wishlist', label: 'Wishlist' },
-    { id: 'compare', label: 'Compare' }
+    { id: 'compare', label: 'Compare' },
+    { id: 'contact', label: 'Contact' }
   ]
 
   return (
