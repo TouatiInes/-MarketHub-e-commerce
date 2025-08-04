@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import ProductCard from './ProductCard'
-import productService from '../services/productService'
+import { productService } from '../services/productService'
 
 const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
   const [selectedCategory, setSelectedCategory] = useState('all')
