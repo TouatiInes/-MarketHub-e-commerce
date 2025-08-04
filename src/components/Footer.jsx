@@ -115,7 +115,7 @@ const Footer = ({ onNavigate }) => {
             <h4 className="text-lg font-semibold mb-4 text-accent-400">Contact Us</h4>
             <div className="space-y-2 text-gray-300 text-sm">
               <p>Email: support@markethub.com</p>
-              <p>Phone: +1 (555) 123-4567</p>
+              <p>Phone: +216 12 345 678</p>
               <p>Hours: Mon-Fri 9AM-6PM EST</p>
             </div>
             <div className="mt-4 space-y-2">

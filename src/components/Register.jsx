@@ -183,7 +183,7 @@ const Register = ({ onNavigate, onClose }) => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-colors min-h-[44px]"
-                placeholder="+1 (555) 123-4567"
+                placeholder="+216 12 345 678"
                 disabled={isSubmitting}
               />
             </div>
