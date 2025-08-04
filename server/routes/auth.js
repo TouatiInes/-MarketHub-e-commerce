@@ -139,9 +139,22 @@ router.get('/me', auth, async (req, res) => {
       throw new Error('Database connection not available');
     }
 
+    // Validate and convert ObjectId
+    let userObjectId;
+
+    try {
+      userObjectId = new mongoose.Types.ObjectId(req.user.id);
+    } catch (error) {
+      console.error('❌ Invalid user ObjectId:', req.user.id);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID format'
+      });
+    }
+
     // Get user with populated cart and wishlist
     const userAggregation = await db.collection('users').aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(req.user.id) } },
+      { $match: { _id: userObjectId } },
       {
         $lookup: {
           from: 'products',
@@ -318,6 +331,14 @@ router.post('/cart', auth, async (req, res) => {
 
     const { productId, quantity = 1 } = req.body;
 
+    // Validate inputs
+    if (!productId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product ID is required'
+      });
+    }
+
     // Use direct MongoDB operations to avoid Mongoose buffering issues
     const mongoose = require('mongoose');
     const db = mongoose.connection.db;
@@ -326,9 +347,23 @@ router.post('/cart', auth, async (req, res) => {
       throw new Error('Database connection not available');
     }
 
+    // Validate and convert ObjectIds
+    let userObjectId, productObjectId;
+
+    try {
+      userObjectId = new mongoose.Types.ObjectId(req.user.id);
+      productObjectId = new mongoose.Types.ObjectId(productId);
+    } catch (error) {
+      console.error('❌ Invalid ObjectId:', { userId: req.user.id, productId });
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID or product ID format'
+      });
+    }
+
     // Get user with direct MongoDB query
     const user = await db.collection('users').findOne({
-      _id: new mongoose.Types.ObjectId(req.user.id)
+      _id: userObjectId
     });
 
     if (!user) {
@@ -354,7 +389,7 @@ router.post('/cart', auth, async (req, res) => {
     } else {
       // Add new item to cart
       user.cart.push({
-        product: new mongoose.Types.ObjectId(productId),
+        product: productObjectId,
         quantity: quantity,
         addedAt: new Date()
       });
@@ -362,7 +397,7 @@ router.post('/cart', auth, async (req, res) => {
 
     // Update user in database
     await db.collection('users').updateOne(
-      { _id: new mongoose.Types.ObjectId(req.user.id) },
+      { _id: userObjectId },
       {
         $set: {
           cart: user.cart,
@@ -373,7 +408,7 @@ router.post('/cart', auth, async (req, res) => {
 
     // Get updated cart with product details
     const updatedUser = await db.collection('users').aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(req.user.id) } },
+      { $match: { _id: userObjectId } },
       { $unwind: { path: '$cart', preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
@@ -428,9 +463,22 @@ router.delete('/cart/:productId', auth, async (req, res) => {
       throw new Error('Database connection not available');
     }
 
+    // Validate and convert ObjectIds
+    let userObjectId;
+
+    try {
+      userObjectId = new mongoose.Types.ObjectId(req.user.id);
+    } catch (error) {
+      console.error('❌ Invalid user ObjectId:', req.user.id);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID format'
+      });
+    }
+
     // Get user
     const user = await db.collection('users').findOne({
-      _id: new mongoose.Types.ObjectId(req.user.id)
+      _id: userObjectId
     });
 
     if (!user) {
@@ -447,7 +495,7 @@ router.delete('/cart/:productId', auth, async (req, res) => {
 
     // Update user in database
     await db.collection('users').updateOne(
-      { _id: new mongoose.Types.ObjectId(req.user.id) },
+      { _id: userObjectId },
       {
         $set: {
           cart: updatedCart,
@@ -458,7 +506,7 @@ router.delete('/cart/:productId', auth, async (req, res) => {
 
     // Get updated cart with product details
     const updatedUser = await db.collection('users').aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(req.user.id) } },
+      { $match: { _id: userObjectId } },
       { $unwind: { path: '$cart', preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
