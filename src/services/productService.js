@@ -33,9 +33,13 @@ class ProductService {
         }
       });
 
+      // Add cache busting parameter
+      queryParams.append('_t', Date.now());
+
       const response = await fetch(`${API_BASE_URL}/products?${queryParams}`, {
         method: 'GET',
-        headers: this.getAuthHeaders()
+        headers: this.getAuthHeaders(),
+        cache: 'no-cache' // Prevent browser caching
       });
 
       return await this.handleResponse(response);
