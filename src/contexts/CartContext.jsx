@@ -163,6 +163,15 @@ export const CartProvider = ({ children }) => {
 
       if (isAuthenticated) {
         // Add to server cart
+        console.log('🛒 CartContext calling authService.addToCart with:', {
+          product: product.name,
+          productId: product._id,
+          productIdType: typeof product._id,
+          productIdLength: product._id ? product._id.length : 'undefined',
+          productIdString: product._id ? product._id.toString() : 'undefined',
+          quantity
+        });
+
         await authService.addToCart(product._id, quantity);
         dispatch({ type: CART_ACTIONS.ADD_ITEM, payload: cartItem });
       } else {

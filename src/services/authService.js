@@ -112,6 +112,14 @@ class AuthService {
   // Add item to cart
   async addToCart(productId, quantity = 1) {
     try {
+      console.log('🛒 Frontend addToCart called with:', {
+        productId,
+        productIdType: typeof productId,
+        productIdLength: productId ? productId.length : 'undefined',
+        productIdString: productId ? productId.toString() : 'undefined',
+        quantity
+      });
+
       const response = await fetch(`${API_BASE_URL}/auth/cart`, {
         method: 'POST',
         headers: this.getAuthHeaders(),

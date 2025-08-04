@@ -327,15 +327,32 @@ router.put('/change-password', auth, async (req, res) => {
 // @access  Private
 router.post('/cart', auth, async (req, res) => {
   try {
-    console.log('📦 Add to cart request:', { userId: req.user.id, body: req.body });
+    console.log('📦 Add to cart request:', {
+      userId: req.user.id,
+      userIdType: typeof req.user.id,
+      userIdLength: req.user.id ? req.user.id.length : 'undefined',
+      body: req.body,
+      productId: req.body.productId,
+      productIdType: typeof req.body.productId,
+      productIdLength: req.body.productId ? req.body.productId.length : 'undefined'
+    });
 
     const { productId, quantity = 1 } = req.body;
 
     // Validate inputs
     if (!productId) {
+      console.log('❌ Product ID is missing');
       return res.status(400).json({
         success: false,
         message: 'Product ID is required'
+      });
+    }
+
+    if (!req.user.id) {
+      console.log('❌ User ID is missing');
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
       });
     }
 
@@ -350,14 +367,43 @@ router.post('/cart', auth, async (req, res) => {
     // Validate and convert ObjectIds
     let userObjectId, productObjectId;
 
+    console.log('🔍 Attempting ObjectId validation...');
+    console.log('User ID details:', {
+      value: req.user.id,
+      type: typeof req.user.id,
+      length: req.user.id ? req.user.id.length : 'undefined',
+      isString: typeof req.user.id === 'string',
+      isValidLength: req.user.id && req.user.id.length === 24
+    });
+    console.log('Product ID details:', {
+      value: productId,
+      type: typeof productId,
+      length: productId ? productId.length : 'undefined',
+      isString: typeof productId === 'string',
+      isValidLength: productId && productId.length === 24
+    });
+
     try {
+      console.log('🔍 Creating user ObjectId...');
       userObjectId = new mongoose.Types.ObjectId(req.user.id);
-      productObjectId = new mongoose.Types.ObjectId(productId);
+      console.log('✅ User ObjectId created successfully:', userObjectId);
     } catch (error) {
-      console.error('❌ Invalid ObjectId:', { userId: req.user.id, productId });
+      console.error('❌ User ObjectId creation failed:', error.message);
       return res.status(400).json({
         success: false,
-        message: 'Invalid user ID or product ID format'
+        message: `Invalid user ID format: ${error.message}`
+      });
+    }
+
+    try {
+      console.log('🔍 Creating product ObjectId...');
+      productObjectId = new mongoose.Types.ObjectId(productId);
+      console.log('✅ Product ObjectId created successfully:', productObjectId);
+    } catch (error) {
+      console.error('❌ Product ObjectId creation failed:', error.message);
+      return res.status(400).json({
+        success: false,
+        message: `Invalid product ID format: ${error.message}`
       });
     }
 
