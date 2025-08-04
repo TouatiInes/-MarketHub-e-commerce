@@ -86,10 +86,22 @@ const ProductCard = ({ product }) => {
 
         <div className="flex items-center mb-4">
           <div className="flex items-center space-x-1">
-            {renderStars(product.rating?.average || product.rating || 0)}
+            {renderStars(
+              typeof product.rating === 'object' && product.rating?.average !== undefined
+                ? product.rating.average
+                : typeof product.rating === 'number'
+                  ? product.rating
+                  : 0
+            )}
           </div>
           <span className="ml-2 text-sm text-gray-500 font-medium">
-            ({product.rating?.average || product.rating || 0})
+            ({
+              typeof product.rating === 'object' && product.rating?.average !== undefined
+                ? product.rating.average
+                : typeof product.rating === 'number'
+                  ? product.rating
+                  : 0
+            })
             {product.rating?.count && (
               <span className="text-xs"> • {product.rating.count} reviews</span>
             )}
