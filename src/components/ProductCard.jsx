@@ -6,6 +6,14 @@ import WishlistButton from './wishlist/WishlistButton'
 
 
 const ProductCard = ({ product }) => {
+  // Debug product rating structure
+  console.log('🎯 ProductCard rating debug:', {
+    productName: product.name,
+    rating: product.rating,
+    ratingType: typeof product.rating,
+    ratingKeys: product.rating && typeof product.rating === 'object' ? Object.keys(product.rating) : 'not object'
+  });
+
   const renderStars = (rating) => {
     const stars = []
     const fullStars = Math.floor(rating)
