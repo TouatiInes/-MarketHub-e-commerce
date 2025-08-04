@@ -2,16 +2,16 @@ const http = require('http');
 
 console.log('🧪 Testing Create Product API...');
 
-// Sample product data with unique SKU
+// Sample product data - testing conflict resolution
 const productData = {
-  name: "Test Product " + Date.now(),
-  description: "This is a test product created via API",
-  shortDescription: "Test product for API testing",
+  name: "Wireless Bluetooth Headphones", // This name already exists - should auto-generate unique slug
+  description: "This is a test product to test conflict resolution",
+  shortDescription: "Test product for conflict resolution",
   price: 99.99,
   originalPrice: 129.99,
   category: "electronics",
   brand: "TestBrand",
-  sku: "TEST-" + Date.now(),
+  sku: "AT-WH-001", // This SKU already exists - should auto-generate unique SKU
   images: [
     {
       url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",

@@ -176,7 +176,23 @@ router.post('/', [auth, admin], async (req, res) => {
       });
     }
 
-    // Check if SKU already exists using direct MongoDB query
+    // Helper function to generate unique SKU
+    const generateUniqueSku = async (baseSku) => {
+      const db = mongoose.connection.db;
+      let uniqueSku = baseSku.toUpperCase().trim();
+      let counter = 1;
+
+      while (await db.collection('products').findOne({ sku: uniqueSku })) {
+        uniqueSku = `${baseSku.toUpperCase().trim()}-${counter.toString().padStart(3, '0')}`;
+        counter++;
+        if (counter > 999) {
+          throw new Error('Unable to generate unique SKU');
+        }
+      }
+      return uniqueSku;
+    };
+
+    // Get database connection
     const mongoose = require('mongoose');
     const db = mongoose.connection.db;
 
@@ -184,13 +200,17 @@ router.post('/', [auth, admin], async (req, res) => {
       throw new Error('Database connection not available');
     }
 
-    const existingSku = await db.collection('products').findOne({
-      sku: sku.toUpperCase().trim()
-    });
-    if (existingSku) {
+    // Generate unique SKU if needed
+    let finalSku;
+    try {
+      finalSku = await generateUniqueSku(sku);
+      if (finalSku !== sku.toUpperCase().trim()) {
+        console.log(`📝 Generated unique SKU: ${finalSku} (original: ${sku})`);
+      }
+    } catch (error) {
       return res.status(400).json({
         success: false,
-        message: 'Product with this SKU already exists'
+        message: 'Unable to generate unique SKU. Please try a different SKU.'
       });
     }
 
@@ -210,26 +230,39 @@ router.post('/', [auth, admin], async (req, res) => {
       });
     }
 
-    // Generate slug from name
-    const generateSlug = (name) => {
-      return name
+    // Helper function to generate unique slug
+    const generateUniqueSlug = async (name) => {
+      const baseSlug = name
         .toLowerCase()
         .trim()
         .replace(/[^\w\s-]/g, '')
         .replace(/[\s_-]+/g, '-')
         .replace(/^-+|-+$/g, '');
+
+      let uniqueSlug = baseSlug;
+      let counter = 1;
+
+      while (await db.collection('products').findOne({ 'seo.slug': uniqueSlug })) {
+        uniqueSlug = `${baseSlug}-${counter}`;
+        counter++;
+        if (counter > 999) {
+          throw new Error('Unable to generate unique slug');
+        }
+      }
+      return uniqueSlug;
     };
 
-    const slug = generateSlug(name);
-
-    // Check if slug already exists
-    const existingSlug = await db.collection('products').findOne({
-      'seo.slug': slug
-    });
-    if (existingSlug) {
+    // Generate unique slug
+    let finalSlug;
+    try {
+      finalSlug = await generateUniqueSlug(name);
+      if (finalSlug !== name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '')) {
+        console.log(`📝 Generated unique slug: ${finalSlug}`);
+      }
+    } catch (error) {
       return res.status(400).json({
         success: false,
-        message: 'Product with this name already exists (slug conflict)'
+        message: 'Unable to generate unique slug. Please try a different product name.'
       });
     }
 
@@ -243,7 +276,7 @@ router.post('/', [auth, admin], async (req, res) => {
       category: category.toLowerCase(),
       subcategory: subcategory?.trim(),
       brand: brand?.trim(),
-      sku: sku.toUpperCase().trim(),
+      sku: finalSku,
       images: images || [],
       specifications: specifications || [],
       variants: variants || [],
@@ -254,7 +287,7 @@ router.post('/', [auth, admin], async (req, res) => {
       },
       shipping: shipping || {},
       seo: {
-        slug: slug
+        slug: finalSlug
       },
       rating: {
         average: 0,
