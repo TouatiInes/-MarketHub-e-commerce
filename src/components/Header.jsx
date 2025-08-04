@@ -9,6 +9,13 @@ const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
 
+  // Debug authentication status
+  console.log('🔐 Authentication Status:', {
+    isAuthenticated,
+    user: user ? `${user.firstName} ${user.lastName}` : 'Not logged in',
+    currentPage
+  })
+
   const handleSearchSubmit = (e) => {
     e.preventDefault()
     const query = e.target.search.value.trim()
@@ -33,7 +40,8 @@ const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
   ]
 
   return (
-    <header className="bg-transparent shadow-lg sticky top-0 z-50 backdrop-blur-sm border-b border-gray-200/50">
+    <>
+      <header className="bg-transparent shadow-lg sticky top-0 z-50 backdrop-blur-sm border-b border-gray-200/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center h-16">
           {/* Logo */}
@@ -319,6 +327,27 @@ const Header = ({ currentPage, onNavigate, onSearch, searchQuery }) => {
         )}
       </div>
     </header>
+
+    {/* Authentication Notice for Cart Testing */}
+    {!isAuthenticated && currentPage === 'products' && (
+      <div className="bg-yellow-500 text-black px-4 py-3 text-center">
+        <div className="max-w-4xl mx-auto">
+          <p className="font-semibold">
+            🔐 To test cart functionality, please sign in first!
+            <button
+              onClick={() => onNavigate('login')}
+              className="ml-2 bg-black text-yellow-500 px-3 py-1 rounded font-bold hover:bg-gray-800 transition-colors"
+            >
+              Sign In Here
+            </button>
+          </p>
+          <p className="text-sm mt-1">
+            Use: <strong>admin@markethub.com</strong> / <strong>admin123</strong>
+          </p>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 

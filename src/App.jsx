@@ -45,9 +45,8 @@ function App() {
 
   // Debug authentication status
   console.log('🔐 Authentication Status:', {
-    isAuthenticated: user ? true : false,
-    user: user ? `${user.firstName} ${user.lastName}` : 'Not logged in',
-    currentPage
+    currentPage,
+    note: 'Check Header component for login status'
   });
     }
 
@@ -148,25 +147,7 @@ function App() {
             searchQuery={searchQuery}
           />
 
-          {/* Authentication Notice for Cart Testing */}
-          {!user && currentPage === 'products' && (
-            <div className="bg-yellow-500 text-black px-4 py-3 text-center">
-              <div className="max-w-4xl mx-auto">
-                <p className="font-semibold">
-                  🔐 To test cart functionality, please sign in first!
-                  <button
-                    onClick={() => handleNavigation('login')}
-                    className="ml-2 bg-black text-yellow-500 px-3 py-1 rounded font-bold hover:bg-gray-800 transition-colors"
-                  >
-                    Sign In Here
-                  </button>
-                </p>
-                <p className="text-sm mt-1">
-                  Use: <strong>admin@markethub.com</strong> / <strong>admin123</strong>
-                </p>
-              </div>
-            </div>
-          )}
+          {/* Authentication Notice for Cart Testing - Moved to Header component */}
 
           {renderCurrentPage()}
           <Footer onNavigate={handleNavigation} />
