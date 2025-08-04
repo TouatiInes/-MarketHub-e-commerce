@@ -121,7 +121,7 @@ const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
           <div className="product-grid">
             {filteredProducts.map((product, index) => (
               <div
-                key={product.id}
+                key={product._id || product.id}
                 className="animate-scaleIn"
                 style={{ animationDelay: `${index * 100}ms` }}
               >

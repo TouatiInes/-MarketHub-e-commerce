@@ -78,10 +78,13 @@ const ProductCard = ({ product }) => {
 
         <div className="flex items-center mb-4">
           <div className="flex items-center space-x-1">
-            {renderStars(product.rating)}
+            {renderStars(product.rating?.average || product.rating || 0)}
           </div>
           <span className="ml-2 text-sm text-gray-500 font-medium">
-            ({product.rating})
+            ({product.rating?.average || product.rating || 0})
+            {product.rating?.count && (
+              <span className="text-xs"> • {product.rating.count} reviews</span>
+            )}
           </span>
         </div>
 
