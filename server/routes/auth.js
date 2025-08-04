@@ -129,19 +129,96 @@ router.post('/login', async (req, res) => {
 // @access  Private
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
-      .populate('cart.product', 'name price images')
-      .populate('wishlist', 'name price images');
+    console.log('👤 Get current user request:', req.user.id);
+
+    // Use direct MongoDB operations to avoid Mongoose buffering issues
+    const mongoose = require('mongoose');
+    const db = mongoose.connection.db;
+
+    if (!db) {
+      throw new Error('Database connection not available');
+    }
+
+    // Get user with populated cart and wishlist
+    const userAggregation = await db.collection('users').aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(req.user.id) } },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'cart.product',
+          foreignField: '_id',
+          as: 'cartProducts'
+        }
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'wishlist',
+          foreignField: '_id',
+          as: 'wishlistProducts'
+        }
+      },
+      {
+        $addFields: {
+          cart: {
+            $map: {
+              input: '$cart',
+              as: 'cartItem',
+              in: {
+                product: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: '$cartProducts',
+                        cond: { $eq: ['$$this._id', '$$cartItem.product'] }
+                      }
+                    },
+                    0
+                  ]
+                },
+                quantity: '$$cartItem.quantity',
+                addedAt: '$$cartItem.addedAt'
+              }
+            }
+          },
+          wishlist: '$wishlistProducts'
+        }
+      },
+      {
+        $project: {
+          cartProducts: 0,
+          wishlistProducts: 0,
+          password: 0
+        }
+      }
+    ]).toArray();
+
+    const user = userAggregation[0];
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Filter out cart items with null products
+    if (user.cart) {
+      user.cart = user.cart.filter(item => item.product);
+    }
+
+    console.log('✅ User data retrieved successfully');
 
     res.json({
       success: true,
       data: user
     });
   } catch (error) {
-    console.error('Get current user error:', error);
+    console.error('❌ Get current user error:', error.message);
+    console.error('📋 Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Server error while fetching user data'
+      message: 'Server error while fetching user data: ' + error.message
     });
   }
 });
@@ -237,34 +314,101 @@ router.put('/change-password', auth, async (req, res) => {
 // @access  Private
 router.post('/cart', auth, async (req, res) => {
   try {
+    console.log('📦 Add to cart request:', { userId: req.user.id, body: req.body });
+
     const { productId, quantity = 1 } = req.body;
 
-    const user = await User.findById(req.user.id);
-    
+    // Use direct MongoDB operations to avoid Mongoose buffering issues
+    const mongoose = require('mongoose');
+    const db = mongoose.connection.db;
+
+    if (!db) {
+      throw new Error('Database connection not available');
+    }
+
+    // Get user with direct MongoDB query
+    const user = await db.collection('users').findOne({
+      _id: new mongoose.Types.ObjectId(req.user.id)
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Initialize cart if it doesn't exist
+    if (!user.cart) {
+      user.cart = [];
+    }
+
     // Check if item already in cart
-    const existingItem = user.cart.find(
+    const existingItemIndex = user.cart.findIndex(
       item => item.product.toString() === productId
     );
 
-    if (existingItem) {
-      existingItem.quantity += quantity;
+    if (existingItemIndex !== -1) {
+      // Update existing item quantity
+      user.cart[existingItemIndex].quantity += quantity;
     } else {
-      user.cart.push({ product: productId, quantity });
+      // Add new item to cart
+      user.cart.push({
+        product: new mongoose.Types.ObjectId(productId),
+        quantity: quantity,
+        addedAt: new Date()
+      });
     }
 
-    await user.save();
-    await user.populate('cart.product', 'name price images');
+    // Update user in database
+    await db.collection('users').updateOne(
+      { _id: new mongoose.Types.ObjectId(req.user.id) },
+      {
+        $set: {
+          cart: user.cart,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    // Get updated cart with product details
+    const updatedUser = await db.collection('users').aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(req.user.id) } },
+      { $unwind: { path: '$cart', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'cart.product',
+          foreignField: '_id',
+          as: 'cart.productDetails'
+        }
+      },
+      {
+        $addFields: {
+          'cart.product': { $arrayElemAt: ['$cart.productDetails', 0] }
+        }
+      },
+      { $group: {
+        _id: '$_id',
+        cart: { $push: '$cart' }
+      }}
+    ]).toArray();
+
+    const cartData = updatedUser[0]?.cart?.filter(item => item.product) || [];
+
+    console.log('✅ Cart updated successfully:', cartData.length, 'items');
 
     res.json({
       success: true,
-      data: user.cart,
+      data: cartData,
       message: 'Item added to cart'
     });
   } catch (error) {
-    console.error('Add to cart error:', error);
+    console.error('❌ Add to cart error:', error.message);
+    console.error('📋 Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Server error while adding to cart'
+      message: 'Server error while adding to cart: ' + error.message
     });
   }
 });
@@ -274,24 +418,82 @@ router.post('/cart', auth, async (req, res) => {
 // @access  Private
 router.delete('/cart/:productId', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    user.cart = user.cart.filter(
+    console.log('🗑️ Remove from cart request:', { userId: req.user.id, productId: req.params.productId });
+
+    // Use direct MongoDB operations
+    const mongoose = require('mongoose');
+    const db = mongoose.connection.db;
+
+    if (!db) {
+      throw new Error('Database connection not available');
+    }
+
+    // Get user
+    const user = await db.collection('users').findOne({
+      _id: new mongoose.Types.ObjectId(req.user.id)
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Filter out the item to remove
+    const updatedCart = (user.cart || []).filter(
       item => item.product.toString() !== req.params.productId
     );
 
-    await user.save();
-    await user.populate('cart.product', 'name price images');
+    // Update user in database
+    await db.collection('users').updateOne(
+      { _id: new mongoose.Types.ObjectId(req.user.id) },
+      {
+        $set: {
+          cart: updatedCart,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    // Get updated cart with product details
+    const updatedUser = await db.collection('users').aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(req.user.id) } },
+      { $unwind: { path: '$cart', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'cart.product',
+          foreignField: '_id',
+          as: 'cart.productDetails'
+        }
+      },
+      {
+        $addFields: {
+          'cart.product': { $arrayElemAt: ['$cart.productDetails', 0] }
+        }
+      },
+      { $group: {
+        _id: '$_id',
+        cart: { $push: '$cart' }
+      }}
+    ]).toArray();
+
+    const cartData = updatedUser[0]?.cart?.filter(item => item.product) || [];
+
+    console.log('✅ Item removed from cart successfully:', cartData.length, 'items remaining');
 
     res.json({
       success: true,
-      data: user.cart,
+      data: cartData,
       message: 'Item removed from cart'
     });
   } catch (error) {
-    console.error('Remove from cart error:', error);
+    console.error('❌ Remove from cart error:', error.message);
+    console.error('📋 Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Server error while removing from cart'
+      message: 'Server error while removing from cart: ' + error.message
     });
   }
 });
