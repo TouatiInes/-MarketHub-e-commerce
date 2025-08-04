@@ -55,14 +55,14 @@ const AddToCartButton = ({
 
   // Size variants
   const sizeClasses = {
-    sm: 'px-2 py-1 text-xs',
-    md: 'px-3 py-1.5 text-sm',
-    lg: 'px-4 py-2 text-sm',
-    xl: 'px-6 py-3 text-base'
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-5 py-2.5 text-base',
+    xl: 'px-7 py-3.5 text-lg'
   };
 
   const iconSizes = {
-    sm: 'h-3 w-3',
+    sm: 'h-4 w-4',
     md: 'h-4 w-4',
     lg: 'h-5 w-5',
     xl: 'h-6 w-6'
