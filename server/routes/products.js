@@ -176,8 +176,17 @@ router.post('/', [auth, admin], async (req, res) => {
       });
     }
 
-    // Check if SKU already exists
-    const existingSku = await Product.findOne({ sku: sku.toUpperCase() });
+    // Check if SKU already exists using direct MongoDB query
+    const mongoose = require('mongoose');
+    const db = mongoose.connection.db;
+
+    if (!db) {
+      throw new Error('Database connection not available');
+    }
+
+    const existingSku = await db.collection('products').findOne({
+      sku: sku.toUpperCase().trim()
+    });
     if (existingSku) {
       return res.status(400).json({
         success: false,
@@ -201,6 +210,29 @@ router.post('/', [auth, admin], async (req, res) => {
       });
     }
 
+    // Generate slug from name
+    const generateSlug = (name) => {
+      return name
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    };
+
+    const slug = generateSlug(name);
+
+    // Check if slug already exists
+    const existingSlug = await db.collection('products').findOne({
+      'seo.slug': slug
+    });
+    if (existingSlug) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product with this name already exists (slug conflict)'
+      });
+    }
+
     // Create product data
     const productData = {
       name: name.trim(),
@@ -221,17 +253,31 @@ router.post('/', [auth, admin], async (req, res) => {
         trackInventory: inventory?.trackInventory !== false
       },
       shipping: shipping || {},
+      seo: {
+        slug: slug
+      },
+      rating: {
+        average: 0,
+        count: 0
+      },
       tags: tags ? tags.map(tag => tag.toLowerCase().trim()) : [],
       featured: featured === true,
       status: status || 'active',
-      createdBy: req.user.id
+      salesCount: 0,
+      viewCount: 0,
+      createdBy: req.user.id,
+      reviews: [],
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
-    const product = new Product(productData);
-    await product.save();
+    // Insert product using direct MongoDB
+    const result = await db.collection('products').insertOne(productData);
 
-    // Populate creator info for response
-    await product.populate('createdBy', 'firstName lastName email');
+    // Get the created product
+    const product = await db.collection('products').findOne({ _id: result.insertedId });
+
+    console.log('✅ Product created successfully:', product.name);
 
     res.status(201).json({
       success: true,
@@ -239,24 +285,19 @@ router.post('/', [auth, admin], async (req, res) => {
       message: 'Product created successfully'
     });
   } catch (error) {
-    console.error('Create product error:', error);
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        success: false,
-        message: 'Validation error',
-        errors
-      });
-    }
+    console.error('❌ Create product error:', error.message);
+    console.error('📋 Stack:', error.stack);
+
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
         message: 'Product with this SKU or slug already exists'
       });
     }
+
     res.status(500).json({
       success: false,
-      message: 'Server error while creating product'
+      message: 'Server error while creating product: ' + error.message
     });
   }
 });
