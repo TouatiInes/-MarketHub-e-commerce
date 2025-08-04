@@ -163,10 +163,7 @@ const FeatureShowcase = ({ onNavigate }) => {
     }
   ];
 
-  const demoCredentials = [
-    { role: 'Admin', email: 'admin@markethub.com', password: 'admin123' },
-    { role: 'User', email: 'user@markethub.com', password: 'user123' }
-  ];
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -182,21 +179,7 @@ const FeatureShowcase = ({ onNavigate }) => {
           </p>
         </div>
 
-        {/* Demo Credentials */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-12">
-          <h2 className="text-lg font-semibold text-blue-900 mb-4">🔑 Demo Credentials</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {demoCredentials.map((cred, index) => (
-              <div key={index} className="bg-white rounded-lg p-4 border border-blue-200">
-                <h3 className="font-medium text-blue-900 mb-2">{cred.role} Account</h3>
-                <p className="text-sm text-blue-700">
-                  <strong>Email:</strong> {cred.email}<br />
-                  <strong>Password:</strong> {cred.password}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
