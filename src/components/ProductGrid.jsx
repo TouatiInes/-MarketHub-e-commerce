@@ -1,124 +1,65 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProductCard from './ProductCard'
+import productService from '../services/productService'
 
 const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  // Sample product data
-  const products = [
-    {
-      _id: "product-1",
-      id: 1,
-      name: "Wireless Headphones",
-      price: 99.99,
-      category: "electronics",
-      sku: "WH-001",
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-      images: [{ url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop", alt: "Wireless Headphones" }],
-      rating: 4.5,
-      description: "Premium wireless headphones with noise cancellation",
-      inventory: { stock: 50, lowStockThreshold: 10, trackInventory: true },
-      status: "active"
-    },
-    {
-      _id: "product-2",
-      id: 2,
-      name: "Smart Watch",
-      price: 199.99,
-      category: "electronics",
-      sku: "SW-002",
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
-      images: [{ url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop", alt: "Smart Watch" }],
-      rating: 4.8,
-      description: "Advanced smartwatch with health monitoring",
-      inventory: { stock: 25, lowStockThreshold: 5, trackInventory: true },
-      status: "active"
-    },
-    {
-      _id: "product-3",
-      id: 3,
-      name: "Designer Backpack",
-      price: 79.99,
-      category: "fashion",
-      sku: "BP-003",
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
-      images: [{ url: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop", alt: "Designer Backpack" }],
-      rating: 4.3,
-      description: "Stylish and functional designer backpack",
-      inventory: { stock: 30, lowStockThreshold: 5, trackInventory: true },
-      status: "active"
-    },
-    {
-      _id: "product-4",
-      id: 4,
-      name: "Coffee Maker",
-      price: 149.99,
-      category: "home",
-      sku: "CM-004",
-      image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop",
-      images: [{ url: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop", alt: "Coffee Maker" }],
-      rating: 4.6,
-      description: "Professional-grade coffee maker for home use",
-      inventory: { stock: 15, lowStockThreshold: 3, trackInventory: true },
-      status: "active"
-    },
-    {
-      _id: "product-5",
-      id: 5,
-      name: "Running Shoes",
-      price: 129.99,
-      category: "sports",
-      sku: "RS-005",
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
-      images: [{ url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop", alt: "Running Shoes" }],
-      rating: 4.7,
-      description: "Comfortable running shoes for all terrains",
-      inventory: { stock: 40, lowStockThreshold: 8, trackInventory: true },
-      status: "active"
-    },
-    {
-      _id: "product-6",
-      id: 6,
-      name: "Smartphone",
-      price: 699.99,
-      category: "electronics",
-      sku: "SP-006",
-      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop",
-      images: [{ url: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop", alt: "Smartphone" }],
-      rating: 4.9,
-      description: "Latest smartphone with advanced camera system",
-      inventory: { stock: 20, lowStockThreshold: 5, trackInventory: true },
-      status: "active"
-    },
-    {
-      _id: "product-7",
-      id: 7,
-      name: "Yoga Mat",
-      price: 39.99,
-      category: "sports",
-      sku: "YM-007",
-      image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
-      images: [{ url: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop", alt: "Yoga Mat" }],
-      rating: 4.4,
-      description: "Premium yoga mat for comfortable practice",
-      inventory: { stock: 60, lowStockThreshold: 10, trackInventory: true },
-      status: "active"
-    },
-    {
-      _id: "product-8",
-      id: 8,
-      name: "Desk Lamp",
-      price: 59.99,
-      category: "home",
-      sku: "DL-008",
-      image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&h=400&fit=crop",
-      images: [{ url: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&h=400&fit=crop", alt: "Desk Lamp" }],
-      rating: 4.2,
-      description: "Modern LED desk lamp with adjustable brightness",
-      inventory: { stock: 35, lowStockThreshold: 7, trackInventory: true },
-      status: "active"
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        console.log('🔄 Fetching products from API...')
+
+        const response = await productService.getAllProducts()
+        console.log('✅ Products fetched successfully:', response.data.length, 'products')
+        console.log('📦 Sample product IDs:', response.data.slice(0, 3).map(p => ({ name: p.name, id: p._id })))
+
+        setProducts(response.data || [])
+      } catch (error) {
+        console.error('❌ Error fetching products:', error)
+        setError('Failed to load products')
+        // Fallback to empty array instead of mock data
+        setProducts([])
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    fetchProducts()
+  }, [])
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="text-white text-lg">Loading products...</div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="text-red-400 text-lg">{error}</div>
+      </div>
+    )
+  }
+
+  // Empty state
+  if (products.length === 0) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="text-white text-lg">No products found</div>
+      </div>
+    )
+  }
 
   const categories = [
     { id: 'all', name: 'All Products' },
