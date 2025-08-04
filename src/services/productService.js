@@ -1,4 +1,12 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:9876/api';
+
+// Debug: Log the API URL being used
+console.log('🔗 ProductService API URL:', API_BASE_URL);
+console.log('🔧 Environment variables:', {
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  MODE: import.meta.env.MODE,
+  DEV: import.meta.env.DEV
+});
 
 class ProductService {
   // Get auth headers with token
