@@ -9,6 +9,8 @@ const admin = require('../middleware/admin');
 // @access  Public
 router.get('/', async (req, res) => {
   try {
+    console.log('📊 Products route called with query:', req.query);
+
     const {
       page = 1,
       limit = 12,
@@ -22,6 +24,14 @@ router.get('/', async (req, res) => {
       inStock
     } = req.query;
 
+    // Use direct MongoDB connection to avoid Mongoose issues
+    const mongoose = require('mongoose');
+    const db = mongoose.connection.db;
+
+    if (!db) {
+      throw new Error('Database connection not available');
+    }
+
     // Build query
     const query = { status: 'active' };
 
@@ -32,7 +42,10 @@ router.get('/', async (req, res) => {
 
     // Search filter
     if (search) {
-      query.$text = { $search: search };
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
     }
 
     // Price range filter
@@ -52,20 +65,24 @@ router.get('/', async (req, res) => {
       query['inventory.stock'] = { $gt: 0 };
     }
 
+    console.log('📋 Query:', query);
+
     // Sort options
     const sortOptions = {};
     sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-    // Execute query with pagination
-    const products = await Product.find(query)
+    // Execute query with pagination using direct MongoDB
+    const products = await db.collection('products')
+      .find(query)
       .sort(sortOptions)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .populate('createdBy', 'firstName lastName')
-      .select('-reviews'); // Exclude reviews for list view
+      .limit(Number(limit))
+      .skip((Number(page) - 1) * Number(limit))
+      .toArray();
 
     // Get total count for pagination
-    const total = await Product.countDocuments(query);
+    const total = await db.collection('products').countDocuments(query);
+
+    console.log('✅ Found products:', products.length, 'Total:', total);
 
     res.json({
       success: true,
@@ -78,10 +95,11 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get products error:', error);
+    console.error('❌ Get products error:', error.message);
+    console.error('📋 Stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Server error while fetching products'
+      message: 'Server error while fetching products: ' + error.message
     });
   }
 });
