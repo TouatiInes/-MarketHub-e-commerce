@@ -16,11 +16,11 @@ const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
         setError(null)
         console.log('🔄 Fetching products from API...')
 
-        const response = await productService.getAllProducts()
-        console.log('✅ Products fetched successfully:', response.data.length, 'products')
-        console.log('📦 Sample product IDs:', response.data.slice(0, 3).map(p => ({ name: p.name, id: p._id })))
+        const response = await productService.getProducts()
+        console.log('✅ Products fetched successfully:', response.length, 'products')
+        console.log('📦 Sample product IDs:', response.slice(0, 3).map(p => ({ name: p.name, id: p._id })))
 
-        setProducts(response.data || [])
+        setProducts(response || [])
       } catch (error) {
         console.error('❌ Error fetching products:', error)
         setError('Failed to load products')
