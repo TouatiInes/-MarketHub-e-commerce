@@ -63,7 +63,7 @@ const Login = ({ onNavigate, onClose }) => {
     setIsSubmitting(true);
     const credentials = userType === 'admin' 
       ? { email: 'admin@markethub.com', password: 'admin123' }
-      : { email: 'user1@example.com', password: 'password123' };
+      : { email: 'user1@example.com', password: 'user123' };
 
     try {
       const result = await login(credentials.email, credentials.password);
@@ -99,7 +99,7 @@ const Login = ({ onNavigate, onClose }) => {
           )}
 
           {/* Demo Login Buttons */}
-          <div className="mb-6 space-y-3">
+          {/* <div className="mb-6 space-y-3">
             <p className="text-sm text-gray-600 text-center">Quick Demo Login:</p>
             <div className="grid grid-cols-2 gap-3">
               <button
@@ -127,7 +127,7 @@ const Login = ({ onNavigate, onClose }) => {
                 <span className="px-2 bg-white text-gray-500">Or sign in manually</span>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
