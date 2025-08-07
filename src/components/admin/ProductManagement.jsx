@@ -52,8 +52,14 @@ const ProductManagement = () => {
       };
 
       const response = await productService.getProducts(params);
-      setProducts(response.data || []);
-      setTotalPages(response.pagination?.pages || 1);
+      // Support both array and object API responses
+      if (Array.isArray(response)) {
+        setProducts(response);
+        setTotalPages(1);
+      } else {
+        setProducts(response.data || []);
+        setTotalPages(response.pagination?.pages || 1);
+      }
       setError('');
     } catch (err) {
       setError('Failed to load products');

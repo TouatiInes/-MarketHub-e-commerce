@@ -6,12 +6,16 @@ import WishlistButton from './wishlist/WishlistButton'
 
 
 const ProductCard = ({ product }) => {
-  // Debug product rating structure
-  console.log('🎯 ProductCard rating debug:', {
+  // Debug product rating and image structure
+  console.log('🎯 ProductCard debug:', {
     productName: product.name,
     rating: product.rating,
     ratingType: typeof product.rating,
-    ratingKeys: product.rating && typeof product.rating === 'object' ? Object.keys(product.rating) : 'not object'
+    image: product.image,
+    images: product.images,
+    imageType: typeof product.image,
+    imagesArray: Array.isArray(product.images),
+    imagesLength: product.images ? product.images.length : 'undefined'
   });
 
   const renderStars = (rating) => {
@@ -50,7 +54,11 @@ const ProductCard = ({ product }) => {
     <div className="product-card group">
       <div className="relative overflow-hidden rounded-t-xl">
         <ResponsiveImage
-          src={product.image}
+          src={
+            product.images && product.images.length > 0
+              ? (product.images.find(img => img.isPrimary)?.url || product.images[0].url)
+              : '/placeholder.png'
+          }
           alt={product.name}
           className="product-image"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

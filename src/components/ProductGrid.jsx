@@ -1,3 +1,43 @@
+// Product creation form
+const ProductForm = ({ onAdd }) => {
+  const [form, setForm] = useState({ name: '', category: '', price: '', status: 'active' })
+  const [loading, setLoading] = useState(false)
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      // Simulate API call or use productService.createProduct
+      const newProduct = {
+        ...form,
+        price: parseFloat(form.price),
+        _id: Math.random().toString(36).substr(2, 9),
+      }
+      await onAdd(newProduct)
+      setForm({ name: '', category: '', price: '', status: 'active' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form className="mb-8 bg-white p-6 rounded-lg shadow-md flex flex-wrap gap-4 items-end" onSubmit={handleSubmit}>
+      <input name="name" value={form.name} onChange={handleChange} placeholder="Product Name" className="input input-bordered" required />
+      <input name="category" value={form.category} onChange={handleChange} placeholder="Category" className="input input-bordered" required />
+      <input name="price" value={form.price} onChange={handleChange} placeholder="Price" type="number" min="0" className="input input-bordered" required />
+      <select name="status" value={form.status} onChange={handleChange} className="input input-bordered">
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="discontinued">Discontinued</option>
+      </select>
+      <button type="submit" className="btn-primary px-6" disabled={loading}>{loading ? 'Adding...' : 'Add Product'}</button>
+    </form>
+  )
+}
 import { useState, useEffect } from 'react'
 import ProductCard from './ProductCard'
 import { productService } from '../services/productService'
@@ -7,6 +47,7 @@ const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showAll, setShowAll] = useState(true)
 
   // Fetch products from API
   useEffect(() => {
@@ -53,12 +94,67 @@ const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
   }
 
   // Empty state
-  if (products.length === 0) {
-    return (
-      <div className="flex justify-center items-center min-h-64">
-        <div className="text-white text-lg">No products found</div>
-      </div>
-    )
+  // Show the product table only when products exist; otherwise, show 'No products found.'
+// ProductTable component
+const ProductTable = ({ products, onEdit, onDelete }) => (
+  <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+    <thead>
+      <tr>
+        <th className="px-4 py-2 border-b">Name</th>
+        <th className="px-4 py-2 border-b">Category</th>
+        <th className="px-4 py-2 border-b">Price</th>
+        <th className="px-4 py-2 border-b">Status</th>
+        <th className="px-4 py-2 border-b">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {products.length === 0 ? (
+        <tr>
+          <td colSpan={5} className="text-center py-6 text-gray-500">No products found</td>
+        </tr>
+      ) : (
+        products.map(product => (
+          <tr key={product._id || product.id} className="hover:bg-gray-50">
+            <td className="px-4 py-2 border-b">{product.name}</td>
+            <td className="px-4 py-2 border-b">{product.category}</td>
+            <td className="px-4 py-2 border-b">${product.price}</td>
+            <td className="px-4 py-2 border-b">{product.status || 'active'}</td>
+            <td className="px-4 py-2 border-b flex gap-2">
+              <button onClick={() => onEdit(product)} className="btn-secondary px-2 py-1 text-xs flex items-center gap-1">
+                <span role="img" aria-label="edit">✏️</span> Edit
+              </button>
+              <button onClick={() => onDelete(product)} className="btn-danger px-2 py-1 text-xs flex items-center gap-1">
+                <span role="img" aria-label="delete">🗑️</span> Delete
+              </button>
+            </td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+)
+  // Add product handler (for immediate update)
+  const handleAddProduct = async (newProduct) => {
+    setProducts(prev => [newProduct, ...prev])
+  }
+
+  // Edit product handler
+  const handleEditProduct = (product) => {
+    // Show edit modal or navigate to edit page
+    alert(`Edit product: ${product.name}`)
+  }
+
+  // Delete product handler
+  const handleDeleteProduct = async (product) => {
+    if (window.confirm(`Are you sure you want to delete ${product.name}?`)) {
+      // Call API to delete
+      try {
+        await productService.deleteProduct(product._id || product.id)
+        setProducts(prev => prev.filter(p => (p._id || p.id) !== (product._id || product.id)))
+      } catch (err) {
+        alert('Failed to delete product')
+      }
+    }
   }
 
   const categories = [
@@ -70,15 +166,16 @@ const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
   ]
 
   // Filter products by category and search query
-  const filteredProducts = products.filter(product => {
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory
-    const matchesSearch = !searchQuery ||
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase())
-
-    return matchesCategory && matchesSearch
-  })
+  const filteredProducts = showAll
+    ? products
+    : products.filter(product => {
+        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory
+        const matchesSearch = !searchQuery ||
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.category.toLowerCase().includes(searchQuery.toLowerCase())
+        return matchesCategory && matchesSearch
+      })
 
   return (
     <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
@@ -100,12 +197,18 @@ const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
 
         {/* Enhanced Category Filter */}
         <div className="flex flex-wrap justify-center gap-4 mb-12 animate-fadeInUp">
+          <button
+            className={`category-filter category-filter-active`}
+            onClick={() => { setShowAll(true); setSelectedCategory('all'); }}
+          >
+            Show All Products
+          </button>
           {categories.map((category, index) => (
             <button
               key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
+              onClick={() => { setShowAll(false); setSelectedCategory(category.id); }}
               className={`category-filter ${
-                selectedCategory === category.id
+                selectedCategory === category.id && !showAll
                   ? 'category-filter-active'
                   : 'category-filter-inactive'
               }`}
@@ -116,7 +219,7 @@ const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
           ))}
         </div>
 
-        {/* Enhanced Products Grid */}
+        {/* Product cards only, no management table or Add Product button */}
         {filteredProducts.length > 0 ? (
           <div className="product-grid">
             {filteredProducts.map((product, index) => (
@@ -132,26 +235,7 @@ const ProductGrid = ({ searchQuery = '', showTitle = false }) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 animate-fadeInUp">
-            <div className="text-gray-400 mb-4 animate-bounce-gentle">
-              <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">No products found</h3>
-            <p className="text-gray-600 max-w-md mx-auto">
-              {searchQuery
-                ? `No products match "${searchQuery}". Try adjusting your search terms or browse our categories.`
-                : 'No products match the selected category. Try selecting a different category.'
-              }
-            </p>
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className="btn-primary mt-6"
-            >
-              View All Products
-            </button>
-          </div>
+          <div className="mt-8 text-center text-lg text-gray-500">No products found</div>
         )}
       </div>
     </section>
